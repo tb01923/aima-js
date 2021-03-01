@@ -1,4 +1,4 @@
-const {defineProblem} = require('../../search/search-helpers');
+const {defineProblem} = require('../problem-definition');
 const shuffle = require('../../utility/array-shuffle')
 
 const initial = shuffle([1,2,3,4,5,6,7,8,null]).join()
