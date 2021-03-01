@@ -2,6 +2,9 @@
 search/eight-puzzle/eight-puzzle-graph.js
 
 # ide
+**/.idea/workspace.xml
+.idea/aima-js.iml
+.idea/modules.xml
 .idea/**/
 
 # Logs
