@@ -1,0 +1,117 @@
+const {map, extract} = require('fantasy-land');
+const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")
+const {defineProblem} = require('../search-helpers');
+const {bfs} = require('./uninformed/bfs/breadth-first-search');
+const {ucs} = require('./uninformed/bfs/uniform-cost-search');
+const {dfs} = require('./uninformed/dfs/depth-first-search');
+
+const cities = Graph()
+    .from("Arad").to("Zerind").withCost(75)
+    .from("Arad").to("Sibiu").withCost(140)
+    .from("Arad").to("Timisoara").withCost(118)
+    .from("Zerind").to("Oradea").withCost(71)
+    .from("Sibiu").to("Fagaras").withCost(99)
+    .from("Sibiu").to("Rimnicu Vilcea").withCost(80)
+    .from("Sibiu").to("Oradea").withCost(151)
+    .from("Timisoara").to("Lugoj").withCost(111)
+    .from("Fagaras").to("Bucharest").withCost(211)
+    .from("Rimnicu Vilcea").to("Pitesti").withCost(97)
+    .from("Lugoj").to("Mehadia").withCost(70)
+    .from("Mehadia").to("Drobeta").withCost(75)
+    .from("Drobeta").to("Craiova").withCost(120)
+    .from("Craiova").to("Pitesti").withCost(138)
+    .from("Craiova").to("Rimnicu Vilcea").withCost(146)
+    .from("Pitesti").to("Bucharest").withCost(101)
+    .from("Giugriu").to("Bucharest").withCost(90)
+    .from("Urziceni").to("Bucharest").withCost(85)
+    .from("Urziceni").to("Vaslui").withCost(142)
+    .from("Urziceni").to("Hirsova").withCost(98)
+    .from("Hirsova").to("Eforie").withCost(86)
+    .from("Vaslui").to("Isai").withCost(92)
+    .from("Neamt").to("Isai").withCost(87)
+
+
+const letters = Graph()
+    .from("A").to("B").withCost(3)
+    .from("A").to("D").withCost(6)
+    .from("B").to("C").withCost(1)
+    .from("C").to("G").withCost(5)
+    .from("C").to("H").withCost(2)
+    .from("D").to("C").withCost(1)
+    .from("D").to("E").withCost(3)
+    .from("D").to("F").withCost(1)
+    .from("E").to("I").withCost(5)
+    .from("F").to("J").withCost(2)
+    .from("H").to("L").withCost(8)
+    .from("I").to("J").withCost(1)
+    .from("I").to("K").withCost(1)
+    .from("I").to("M").withCost(3)
+    .from("J").to("N").withCost(2)
+    .from("J").to("L").withCost(5)
+    .from("K").to("N").withCost(2)
+    .from("L").to("N").withCost(6)
+    .from("N").to("O").withCost(2)
+
+const directed = edge => [
+    {name: edge.id, nextNode: edge.snd, cost: edge.cost}
+]
+
+const undirected = edge => [
+    {name: edge.id, nextNode: edge.fst, cost: edge.cost},
+    {name: edge.id, nextNode: edge.snd, cost: edge.cost}
+]
+
+
+const followGraph = node => {
+    const K = x => () => x
+    const actions =
+        // get all possible edges from this node
+        node.getEdges()
+        // convert each edge to an array of weighted destinations
+            .map(undirected)
+            // flatten destinations out
+            .flat()
+            // remove current as a possible desitnation
+            .filter(candidate => candidate.nextNode.id != node.id)
+            // create constant function to that destination
+            .map(K)
+
+    return actions
+}
+
+const problemFrom = (start, target, graph) => {
+    return defineProblem(
+        cities,
+        (node) => node.id == target,
+        graph.getNodeById(start),
+        followGraph,
+        null
+    )
+}
+
+
+const aradToBucharest = problemFrom("Arad", "Bucharest", cities)
+const aToJ = problemFrom("A", "J", letters)
+
+const fst = ({fst, snd}) => fst
+const prettyPrint = (solution) => {
+    return solution[map](
+        search => "" + search.cost + " [" + search.steps.map(fst).join(", ") + "]\n" + ""
+            //search.expansion.map(level => "\n\t" + level.map(node => node.id || node.state.id))
+    )[extract]()
+
+}
+
+const prettyPrint2 = (solution) => {
+    const printSteps = (state, steps) => steps.map(({fst, snd}) => `-(${snd.cost})-> ${snd.state.id}  `).join("") + " -> " + state.id
+
+    return solution[map](
+        search => "" + search.cost + " [" + printSteps(search.state, search.steps) + "]\n" + ""
+        //search.expansion.map(level => "\n\t" + level.map(node => node.id || node.state.id))
+    )[extract]()
+
+}
+
+console.log("bfs", prettyPrint(bfs(aToJ)))
+console.log("ucs", prettyPrint(ucs(aToJ)))
+console.log("dfs", prettyPrint(dfs(aToJ, 4)))
