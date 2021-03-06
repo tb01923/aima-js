@@ -30,7 +30,7 @@ const printSolution = (solution) => {
             })
             console.log(makeBoard(boardState.state.value))
         }
-        //"" + search.cost + " [" + search.steps.map(fst).join(", ") + "]\n" + ""
+        //"" + search.g + " [" + search.steps.map(fst).join(", ") + "]\n" + ""
         //search.expansion.map(level => "\n\t" + level.map(node => node.id || node.state.id))
     )[extract]()
 

@@ -1,4 +1,4 @@
-const {defineProblem} = require('../problem-definition');
+const {Problem} = require('../problem-definition');
 const shuffle = require('../../utility/array-shuffle')
 
 const initial = shuffle([1,2,3,4,5,6,7,8,null]).join()
@@ -8,7 +8,7 @@ const initial = shuffle([1,2,3,4,5,6,7,8,null]).join()
 const answer = [null,1,2,3,4,5,6,7,8]
 
 const directed = edge => [
-    {name: edge.id, nextNode: edge.snd, cost: edge.cost}
+    {name: edge.id, nextNode: edge.snd, cost: edge.g}
 ]
 
 const followGraph = node => {
@@ -28,23 +28,41 @@ const followGraph = node => {
     return actions
 }
 
+const equals = x => y => x == y
+const manhattanDistance = (destination) => (current) => {
+    return current.reduce((totalDistance, cVal, c) => {
+        const d = destination.findIndex(equals(cVal))
+        const dRow = Math.ceil((d + 1) * 3 / 9)
+        const dCol = (d % 3) + 1
+
+        const cRow = Math.ceil((c + 1) * 3 / 9)
+        const cCol = (c % 3) + 1
+
+        const cellDistance = Math.abs(dRow - cRow) + Math.abs(dCol - cCol)
+        return totalDistance +  cellDistance
+    }, 0)
+}
+
+
 console.log((new Date()).toISOString(), "loading search space...")
 const graph = require("./eight-puzzle-graph")
 console.log((new Date()).toISOString(), "loaded!")
 
-const eightPuzzle = defineProblem(
+const eightPuzzle = Problem(
     graph,
-    (node) => node.id == answer,
+    (node) => node.id == answer.join(),
     graph.getNodeById(initial),
     followGraph,
-    null
+    null,
+    manhattanDistance(answer)
 )
 
 const {bfs} = require('../known-deterministic-observable/uninformed/bfs/breadth-first-search');
 const {dfs, dfs_deepening} = require('../known-deterministic-observable/uninformed/dfs/depth-first-search');
+const {rbfs} = require('../known-deterministic-observable/informed/recursive-best-first-search');
 
 console.log((new Date()).toISOString(), "finding solution...")
-const solution = dfs_deepening(eightPuzzle, 100)
+const solution = rbfs(eightPuzzle, 100)
 console.log((new Date()).toISOString(), "complete!")
 
 const printSolution = require('./eight-puzzle-solution-output')

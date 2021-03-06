@@ -35,12 +35,13 @@ NotFound.prototype[map] = f => NotFound()
 NotFound.prototype[extract] = () => null
 
 // const functor to null
-const SearchLimitExhausted =  function() {
+const SearchLimitExhausted =  function(limit) {
     const self = getInstance(this, SearchLimitExhausted)
+    self[map] = f => NotFound()
+    self[extract] = () => limit
     return Object.freeze(self)
 }
-SearchLimitExhausted.prototype[map] = f => NotFound()
-SearchLimitExhausted.prototype[extract] = () => null
+
 
 module.exports = {
     SearchResult,

@@ -7,7 +7,7 @@ function PriorityQueue() {
     self = getInstance(this, PriorityQueue)
     self.elements = [];
     self.enqueue = function (e) {
-        const insertPoint = self.elements.findIndex(q => q.cost > e.cost)
+        const insertPoint = self.elements.findIndex(q => q.g > e.g)
         if(insertPoint == -1) {
             self.elements.push(e);
         } else {

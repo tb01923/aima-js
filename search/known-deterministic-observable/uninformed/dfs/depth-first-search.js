@@ -1,47 +1,44 @@
 const {NotFound, Solution, SearchLimitExhausted} = require("../../../../utility/search-result-functor")
-const {Queue} = require("../../../../abstract-data-types/queue.js")
-const {SearchNode, getChild} = require("../../../search-helpers")
 
-const trackExpansion = (problem, frontier) => {
-    return false
-    problem.expansion.push(frontier.slice(0))
-}
+const dfs = (problem, limit = 3) =>
+    dfs_recursive(problem, limit, problem.getInitialSearchNode())
 
-const dfs = (problem, limit = 3) => {
-    const initialNode = SearchNode(problem.initialState, 0)
-    return dfs_recursive(problem, limit, initialNode)
-}
 
-const dfs_recursive = (problem, limit, node) => {
-    if (problem.meetsGoal(node.state)) {
-        node.expansion = problem.expansion
-        return Solution(node)
+const dfs_recursive = (problem, limit, searchNode) => {
+    if (searchNode.meetsGoal()) {
+        return Solution(searchNode)
+    } else if (limit == 0) {
+        return SearchLimitExhausted()
     }
-    if (limit == 0) return SearchLimitExhausted()
 
-    // need to reverse the actions so they behave like stack
-    // as opposed to a queue
-    const actions = problem.actions(node.state).reverse()
-
-    // not used for solution, but good for understanding
-    trackExpansion(problem, actions.map(f => f().nextNode))
 
     let isSearchLimit = false
-    for (const action of actions) {
+
+    // reverse actions for "stack" (LIFO) behavior
+    for (const action of searchNode.getActions().reverse()) {
+
         // get child based on action on current node
-        const child = getChild(problem, node, action)
+        const childNode = searchNode.takeAction(action)
 
-        if (node.notVisited(child)) {
+        // verify that this child hasn't been visited on the path of this searchNode
+        //  to avoid paths that cycle between nodes
+        if (searchNode.notVisited(childNode)) {
 
-            const result = dfs_recursive(problem, limit - 1, child)
+            const result = dfs_recursive(problem, limit - 1, childNode)
 
             if (result instanceof Solution) {
                 return result
             }
-            if (result instanceof SearchLimitExhausted) isSearchLimit = true
+            else if (result instanceof SearchLimitExhausted) {
+                isSearchLimit = true
+            }
         }
 
     }
+
+    // if a solution was found, it would have exited by this point.
+    //  we either failed to find a solution because it doesn't exist
+    //  or the search depth limit was reached on all actions.
     if (isSearchLimit) {
         return SearchLimitExhausted()
     } else {

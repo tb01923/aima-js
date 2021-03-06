@@ -1,41 +1,31 @@
 const { NotFound, Solution  }= require("../../../../utility/search-result-functor")
 const {Queue} = require("../../../../abstract-data-types/queue.js")
-const {SearchNode, getChild} = require("../../../search-helpers")
-
-const trackExpansion = (problem, frontier) => {
-    return
-    problem.expansion.push(frontier.elements.slice(0))
-}
 
 const bfs = (problem) =>  {
     const frontier = Queue()
     const explored = new Set()
 
-    const initialNode = SearchNode(problem.initialState, 0)
-    if (problem.meetsGoal(initialNode.state)) {
-        initialNode.expansion = problem.expansion
+    const initialNode = problem.getInitialSearchNode()
+
+    if (initialNode.meetsGoal()) {
         return Solution(initialNode)
     }
 
     frontier.enqueue(initialNode)
 
-    // not used for solution, but good for understanding
-    trackExpansion(problem, frontier)
-
     while (!frontier.isEmpty()) {
-        const node = frontier.dequeue()
-        explored.add(node.state)
+        const searchNode = frontier.dequeue()
+        explored.add(searchNode.state)
 
         // for all possible actions
-        const actions =  problem.actions(node.state)
-        for(const action of actions) {
+        for(const action of searchNode.getActions()) {
 
             // get child based on action on current node
-            const child = getChild(problem, node, action)
+            const child = searchNode.takeAction(action)
 
             // if this child has not been explored and is not already on frontier
             if (!explored.has(child.state) && !frontier.contains(child)) {
-                if (problem.meetsGoal(child.state)) {
+                if (problem.goalTest(child.state)) {
                     child.expansion = problem.expansion
                     return Solution(child)
                 }
@@ -44,8 +34,6 @@ const bfs = (problem) =>  {
                 frontier.enqueue(child)
             }
         }
-        // not used for solution, but good for understanding
-        trackExpansion(problem, frontier)
     }
 
     return NotFound()

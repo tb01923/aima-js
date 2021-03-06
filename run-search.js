@@ -1,9 +1,10 @@
 const {map, extract} = require('fantasy-land');
-const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")
-const {defineProblem} = require('../search-helpers');
-const {bfs} = require('./uninformed/bfs/breadth-first-search');
-const {ucs} = require('./uninformed/bfs/uniform-cost-search');
-const {dfs} = require('./uninformed/dfs/depth-first-search');
+const {Graph, Edge, Node} = require("./abstract-data-types/graph.js")
+const {Problem} = require('./search/problem-definition');
+const {bfs} = require('./search/known-deterministic-observable/uninformed/bfs/breadth-first-search');
+const {ucs} = require('./search/known-deterministic-observable/uninformed/bfs/uniform-cost-search');
+const {dfs} = require('./search/known-deterministic-observable/uninformed/dfs/depth-first-search');
+const {rbfs} = require('./search/known-deterministic-observable/informed/recursive-best-first-search');
 
 const cities = Graph()
     .from("Arad").to("Zerind").withCost(75)
@@ -30,11 +31,22 @@ const cities = Graph()
     .from("Vaslui").to("Isai").withCost(92)
     .from("Neamt").to("Isai").withCost(87)
 
+/*
+
+                         a
+                 b                d
+         c                   c        e     f
+      g    h              g    h
+
+
+
+ */
+
 
 const letters = Graph()
     .from("A").to("B").withCost(3)
     .from("A").to("D").withCost(6)
-    .from("B").to("C").withCost(1)
+    .from("B").to("C").withCost(7)
     .from("C").to("G").withCost(5)
     .from("C").to("H").withCost(2)
     .from("D").to("C").withCost(1)
@@ -53,12 +65,12 @@ const letters = Graph()
     .from("N").to("O").withCost(2)
 
 const directed = edge => [
-    {name: edge.id, nextNode: edge.snd, cost: edge.cost}
+    {name: edge.id, nextNode: edge.snd, cost: edge.g}
 ]
 
 const undirected = edge => [
-    {name: edge.id, nextNode: edge.fst, cost: edge.cost},
-    {name: edge.id, nextNode: edge.snd, cost: edge.cost}
+    {name: edge.id, nextNode: edge.fst, cost: edge.g},
+    {name: edge.id, nextNode: edge.snd, cost: edge.g}
 ]
 
 
@@ -68,7 +80,7 @@ const followGraph = node => {
         // get all possible edges from this node
         node.getEdges()
         // convert each edge to an array of weighted destinations
-            .map(undirected)
+            .map(directed)
             // flatten destinations out
             .flat()
             // remove current as a possible desitnation
@@ -79,13 +91,18 @@ const followGraph = node => {
     return actions
 }
 
+const randomDistance = (destination) => (current) => {
+    return Math.random() * 4 * (destination.charCodeAt(0) - current.charCodeAt(0))
+}
+
 const problemFrom = (start, target, graph) => {
-    return defineProblem(
-        cities,
+    return Problem(
+        letters,
         (node) => node.id == target,
         graph.getNodeById(start),
         followGraph,
-        null
+        null,
+        randomDistance(target)
     )
 }
 
@@ -96,22 +113,23 @@ const aToJ = problemFrom("A", "J", letters)
 const fst = ({fst, snd}) => fst
 const prettyPrint = (solution) => {
     return solution[map](
-        search => "" + search.cost + " [" + search.steps.map(fst).join(", ") + "]\n" + ""
+        search => "" + search.g + " [" + search.steps.map(fst).join(", ") + "]\n" + ""
             //search.expansion.map(level => "\n\t" + level.map(node => node.id || node.state.id))
     )[extract]()
 
 }
 
 const prettyPrint2 = (solution) => {
-    const printSteps = (state, steps) => steps.map(({fst, snd}) => `-(${snd.cost})-> ${snd.state.id}  `).join("") + " -> " + state.id
+    const printSteps = (state, steps) => steps.map(({fst, snd}) => `-(${snd.g})-> ${snd.state.id}  `).join("") + " -> " + state.id
 
     return solution[map](
-        search => "" + search.cost + " [" + printSteps(search.state, search.steps) + "]\n" + ""
+        search => "" + search.g + " [" + printSteps(search.state, search.steps) + "]\n" + ""
         //search.expansion.map(level => "\n\t" + level.map(node => node.id || node.state.id))
     )[extract]()
 
 }
 
-console.log("bfs", prettyPrint(bfs(aToJ)))
-console.log("ucs", prettyPrint(ucs(aToJ)))
-console.log("dfs", prettyPrint(dfs(aToJ, 4)))
+console.log("bfs", prettyPrint(bfs(aradToBucharest)))
+console.log("ucs", prettyPrint(ucs(aradToBucharest)))
+console.log("dfs", prettyPrint(dfs(aradToBucharest, 10)))
+console.log("rbfs", prettyPrint(rbfs(aToJ)))

@@ -1,59 +1,51 @@
 const {NotFound, Solution}= require("../../../../utility/search-result-functor")
 const {PriorityQueue} = require("../../../../abstract-data-types/priority-queue.js")
-const {SearchNode, getChild} = require("../../../search-helpers")
-
-const trackExpansion = (problem, frontier) => {
-    return
-    problem.expansion.push(frontier.elements.slice(0))
-}
 
 const ucs = (problem) =>  {
     const frontier = PriorityQueue()
     const explored = new Set()
 
-    const initialNode = SearchNode(problem.initialState, 0)
-    if (problem.meetsGoal(initialNode.state)) {
+    const initialNode = problem.getInitialSearchNode()
+
+    if (problem.goalTest(initialNode.state)) {
         return Solution(initialNode)
     }
 
     frontier.enqueue(initialNode)
-    // not used for solution, but good for understanding
-    trackExpansion(problem, frontier)
+
 
 
     while (!frontier.isEmpty()) {
-        const node = frontier.dequeue()
-        if (problem.meetsGoal(node.state)) {
-            node.expansion = problem.expansion
-            return Solution(node)
+        const searchNode = frontier.dequeue()
+
+        if (searchNode.meetsGoal()) {
+            return Solution(searchNode)
         }
 
-        explored.add(node.state)
+        explored.add(searchNode.state)
 
         // for all possible actions
-        const actions =  problem.actions(node.state)
-        for(const action of actions) {
+        for(const action of searchNode.getActions()) {
 
             // get child based on action on current node
-            const child = getChild(problem, node, action)
+            const child = searchNode.takeAction(action)
 
             // if this child has not been explored and is not already on frontier
             if (!explored.has(child.state) && !frontier.contains(child)) {
                 // push new nodes into fronteir
                 frontier.enqueue(child)
-                problem.expansion.push(frontier.elements.slice(0))
+
             }
             else if (frontier.contains(child)) {
                 // if this path is lower cost path to the item on the frontier, replace the
                 //      expensive path with this one
                 const {idx, item} = frontier.getItem(child)
-                if(child.cost < item.cost) {
+                if(child.g < item.g) {
                     frontier.replace(idx, child)
                 }
             }
         }
-        // not used for solution, but good for understanding
-        trackExpansion(problem, frontier)
+
     }
 
     return NotFound()

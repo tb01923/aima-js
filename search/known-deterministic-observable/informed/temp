@@ -1,0 +1,27 @@
+RBFS (node: searchNode, value: V, bound: B)
+    IF f(searchNode)>B, return f(searchNode)
+    IF searchNode is a goal, EXIT algorithm
+    IF searchNode has no children, RETURN infinity
+    
+    FOR each child Ni of searchNode,
+        IF f(searchNode) < V AND f(Ni) < V THEN F[i] := V
+        ELSE F[i] := f(Ni)
+    
+    sort Ni and F[i] in increasing order of F[i]
+    IF only one child, alternative := infinity
+    
+    WHILE (best <= B)
+        best := RBFS(N1, best, MIN(B, alternative))
+        insert N1 and best in sorted order
+    return best
+
+
+    B 3 -8 -5
+    D 6 -6 0
+    B 3 -8 undefined
+    D 6 -6 undefined
+
+B 3 8 11
+D 6 6 12
+B 3 8 undefined
+D 6 6 undefined

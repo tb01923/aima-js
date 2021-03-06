@@ -69,24 +69,18 @@ const Graph = function () {
     return self
 }
 
-const Node = function (id, value) {
+const Node = function (id, value, h) {
     const self = getInstance(this, Node)
 
     self.id = id
     self.value = (arguments.length > 1) ? value : id
+    self.h = h
     self.edges = []
 
     self.addEdge = (edge) => {
         self.edges.push(edge);
         return self
     }
-
-    // self.getChildren = (depth=1) => {
-    //     return self.edges
-    //         .map(edge => [edge.fst, edge.snd])
-    //         .flat()
-    //         .filter(node => node.id != self.id)
-    // }
 
     self.getEdges = (depth = 1) => {
         return self.edges
@@ -99,7 +93,7 @@ const Edge = function (id, cost, direction) {
 
     const self = getInstance(this, Edge)
     self.id = id
-    self.cost = (arguments.length > 1) ? cost : 0
+    self.g = (arguments.length > 1) ? cost : 0
     self.direction = direction || Edge.BIDIRECTIOAL
 
     self.setNodes = (fst, snd, direction) => {

@@ -5,17 +5,39 @@ const {makePermutations} = require("../../utility/array-permutations")
 
 // make all combinations of where the elements can be
 const boardPermutations = makePermutations(9, [1,2,3,4,5,6,7,8,null])
+const answer = [null,1,2,3,4,5,6,7,8]
 
 const builder = fs.createWriteStream('./eight-puzzle-graph.js')
+
+const equals = x => y => x == y
+
+const manhattanDistance = (current, destination) => {
+
+    return current.reduce((totalDistance, cVal, c) => {
+        const d = destination.findIndex(equals(cVal))
+        const dRow = Math.ceil((d + 1) * 3 / 9)
+        const dCol = (d % 3) + 1
+
+        const cRow = Math.ceil((c + 1) * 3 / 9)
+        const cCol = (c % 3) + 1
+
+        const cellDistance = Math.abs(dRow - cRow) + Math.abs(dCol - cCol)
+        return totalDistance +  cellDistance
+    }, 0)
+}
+const h = manhattanDistance
 
 
 builder.write(`const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")\n`)
 builder.write(`const graph = Graph()\n`)
 
+const graph = Graph()
+
+
 // add each permutation of the board to the graph
 boardPermutations.map(permutation => {
-    builder.write(`graph.addNode(Node("${permutation.join(",")}", [${permutation}]))\n`)
-    //return graph.addNode(Node(permutation.join(","), permutation))
+    builder.write(`graph.addNode(Node("${permutation.join(",")}", [${permutation}], ${h(permutation, answer)}))\n`)
+    //graph.addNode(Node(permutation.join(","), permutation, h(permutation, answer)))
 })
 
 // identify and add edges
