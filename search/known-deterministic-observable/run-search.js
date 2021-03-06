@@ -1,6 +1,6 @@
 const {map, extract} = require('fantasy-land');
 const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")
-const {defineProblem} = require('../search-helpers');
+const {defineProblem} = require('../problem-definition');
 const {bfs} = require('./uninformed/bfs/breadth-first-search');
 const {ucs} = require('./uninformed/bfs/uniform-cost-search');
 const {dfs} = require('./uninformed/dfs/depth-first-search');

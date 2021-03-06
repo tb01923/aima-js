@@ -1,6 +1,6 @@
 const { NotFound, Solution  }= require("../../../../utility/search-result-functor")
 const {Queue} = require("../../../../abstract-data-types/queue.js")
-const {SearchNode, getChild} = require("../../../search-helpers")
+const {SearchNode, getChild} = require("../../../problem-definition")
 
 const trackExpansion = (problem, frontier) => {
     return
