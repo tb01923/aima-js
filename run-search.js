@@ -65,12 +65,12 @@ const letters = Graph()
     .from("N").to("O").withCost(2)
 
 const directed = edge => [
-    {name: edge.id, nextNode: edge.snd, cost: edge.g}
+    {name: edge.id, nextState: edge.snd, cost: edge.g}
 ]
 
 const undirected = edge => [
-    {name: edge.id, nextNode: edge.fst, cost: edge.g},
-    {name: edge.id, nextNode: edge.snd, cost: edge.g}
+    {name: edge.id, nextState: edge.fst, cost: edge.g},
+    {name: edge.id, nextState: edge.snd, cost: edge.g}
 ]
 
 
@@ -84,7 +84,7 @@ const followGraph = node => {
             // flatten destinations out
             .flat()
             // remove current as a possible desitnation
-            .filter(candidate => candidate.nextNode.id != node.id)
+            .filter(candidate => candidate.nextState.id != node.id)
             // create constant function to that destination
             .map(K)
 
@@ -92,7 +92,7 @@ const followGraph = node => {
 }
 
 const randomDistance = (destination) => (current) => {
-    return Math.random() * 4 * (destination.charCodeAt(0) - current.charCodeAt(0))
+    return 1 //(destination.charCodeAt(0) - current.charCodeAt(0))
 }
 
 const problemFrom = (start, target, graph) => {
@@ -129,7 +129,7 @@ const prettyPrint2 = (solution) => {
 
 }
 
-console.log("bfs", prettyPrint(bfs(aradToBucharest)))
-console.log("ucs", prettyPrint(ucs(aradToBucharest)))
-console.log("dfs", prettyPrint(dfs(aradToBucharest, 10)))
+console.log("bfs", prettyPrint(bfs(aToJ)))
+console.log("ucs", prettyPrint(ucs(aToJ)))
+console.log("dfs", prettyPrint(dfs(aToJ, 10)))
 console.log("rbfs", prettyPrint(rbfs(aToJ)))

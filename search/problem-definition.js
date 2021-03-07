@@ -16,13 +16,21 @@ const Problem = function(states, goalTest, initialState, actions, stepCosts, heu
     self.stepCosts = stepCosts
     self.heuristic = heuristic
 
-    self.getInitialSearchNode = () => SearchNode(initialState, 0, null, [], self)
+    self.getInitialSearchNode = () => SearchNode(self, initialState, 0)
     self.getActionsForState = (state) => K(self.actions(state) || [])
 
     return self
 }
 
-const SearchNode = function(state, g, h, steps=[], problem) {
+const Step = function(from, label, to) {
+    const self = getInstance(this, Step)
+    self.fst = label
+    self.snd = from
+
+    return self
+}
+
+const SearchNode = function(problem, state, g, h, steps=[]) {
     const self = getInstance(this, SearchNode)
 
     self.state = state
@@ -32,20 +40,26 @@ const SearchNode = function(state, g, h, steps=[], problem) {
 
     self.meetsGoal = K(problem.goalTest(self.state))
 
+    self.addStep = step => {
+        self.steps = self.steps.concat([step])
+        return self
+    }
+
     self.getActions = problem && problem.getActionsForState(self.state)
 
     self.takeAction = action => {
-        const {name, nextNode, cost} = action()
-        const stepLabel = `${name} (${cost}, ~${self.f})`
-        const thisStep = Pair(stepLabel, self)
+        const {name, nextState, cost} = action()
 
-        return SearchNode(
-            nextNode,
+        const childNode = SearchNode(
+            problem,
+            nextState,
             self.g + cost,
-            problem.heuristic(nextNode.value) ,
-            self.steps.concat([thisStep]),
-            problem
+            problem.heuristic(nextState.value) ,
+            self.steps
         )
+''
+        childNode.addStep(Step(self, `${name}[cost: ${cost}, est-remain ${childNode.h ? "~" + childNode.h : ""}]`, childNode))
+        return childNode
     }
 
     self.notVisited = (searchNode) => {
