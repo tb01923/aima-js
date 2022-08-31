@@ -48,16 +48,19 @@ const SearchNode = function(problem, state, g, h, steps=[]) {
     self.getActions = problem && problem.getActionsForState(self.state)
 
     self.takeAction = action => {
-        const {name, nextState, cost} = action()
+        const result = action()
+        const cost = result.cost || 0
+        const name = result.name || ""
+        const nextState = result.nextState;
 
         const childNode = SearchNode(
             problem,
             nextState,
             self.g + cost,
-            problem.heuristic(nextState.value) ,
+            problem.heuristic(nextState.value || nextState) ,
             self.steps
         )
-''
+
         childNode.addStep(Step(self, `${name}[cost: ${cost}, est-remain ${childNode.h ? "~" + childNode.h : ""}]`, childNode))
         return childNode
     }

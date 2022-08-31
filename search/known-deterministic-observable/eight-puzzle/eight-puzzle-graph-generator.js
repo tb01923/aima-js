@@ -1,6 +1,5 @@
 const fs = require('fs')
-const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")
-const {makePermutations} = require("../../utility/array-permutations")
+const {makePermutations} = require("../../../utility/array-permutations")
 
 
 // make all combinations of where the elements can be
@@ -28,16 +27,12 @@ const manhattanDistance = (current, destination) => {
 const h = manhattanDistance
 
 
-builder.write(`const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")\n`)
+builder.write(`const {Graph, Edge, Node} = require("../../../abstract-data-types/graph.js")\n`)
 builder.write(`const graph = Graph()\n`)
-
-const graph = Graph()
-
 
 // add each permutation of the board to the graph
 boardPermutations.map(permutation => {
     builder.write(`graph.addNode(Node("${permutation.join(",")}", [${permutation}], ${h(permutation, answer)}))\n`)
-    //graph.addNode(Node(permutation.join(","), permutation, h(permutation, answer)))
 })
 
 // identify and add edges
@@ -69,7 +64,6 @@ boardPermutations.map(permutation => {
         nextPermutation[emptyIndex] = nextPermutation[node.index]
         nextPermutation[node.index] = temp
 
-        //graph.from(permutation.join(",")).to(nextPermutation.join(",")).withEdge(Edge(label, 1, Edge.UNIDIRECTIOAL))
         builder.write(`graph.from("${permutation.join(",")}").to("${nextPermutation.join(",")}").withEdge(Edge("${label}", 1, Edge.UNIDIRECTIOAL))\n`)
     })
 })

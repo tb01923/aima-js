@@ -1,10 +1,10 @@
 const {map, extract} = require('fantasy-land');
-const {Graph, Edge, Node} = require("./abstract-data-types/graph.js")
-const {Problem} = require('./search/problem-definition');
-const {bfs} = require('./search/known-deterministic-observable/uninformed/bfs/breadth-first-search');
-const {ucs} = require('./search/known-deterministic-observable/uninformed/bfs/uniform-cost-search');
-const {dfs} = require('./search/known-deterministic-observable/uninformed/dfs/depth-first-search');
-const {rbfs} = require('./search/known-deterministic-observable/informed/recursive-best-first-search');
+const {Graph, Edge, Node} = require("../../abstract-data-types/graph.js")
+const {Problem} = require('../problem-definition');
+const {bfs} = require('./uninformed/bfs/breadth-first-search');
+const {ucs} = require('./uninformed/bfs/uniform-cost-search');
+const {dfs} = require('./uninformed/dfs/depth-first-search');
+const {rbfs} = require('./informed/recursive-best-first-search');
 
 const cities = Graph()
     .from("Arad").to("Zerind").withCost(75)

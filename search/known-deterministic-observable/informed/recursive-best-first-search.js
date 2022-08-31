@@ -64,7 +64,7 @@ const rbfs_recursive = (problem, fLimit, searchNode, move = "", level = 0) => {
 
         //const alternative = successors[0] || {"f": Number.POSITIVE_INFINITY}
         const newLimit = min(fLimit, alternative.f)
-        const result = rbfs_recursive(problem, newLimit, best, best.steps[best.steps.length - 1].fst, level + 1)
+        const result = rbfs_recursive(problem, newLimit, best)
 
         if (result instanceof Solution) {
             return result
