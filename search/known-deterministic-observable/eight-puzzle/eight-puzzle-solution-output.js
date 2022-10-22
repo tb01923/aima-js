@@ -1,5 +1,5 @@
 const {map, extract} = require('fantasy-land');
-const arrayToMatrix = require('../../utility/array-to-matrix')
+const arrayToMatrix = require('../../../utility/array-to-matrix')
 
 const makeBoard = board => {
     board = arrayToMatrix(board, 3)

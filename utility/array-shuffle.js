@@ -17,4 +17,4 @@ const shuffle = (array) => {
     return array;
 }
 
-module.exports = shuffle
+module.exports = { shuffle }

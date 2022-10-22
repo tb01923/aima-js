@@ -1,5 +1,6 @@
 # auto generated data and graphs
-search/eight-puzzle/eight-puzzle-graph.js
+search/known-deterministic-observable/eight-puzzle/eight-puzzle-graph.js
+search/local-search/eight-queens/eight-queens/eight-queens-graph.js
 
 # ide
 **/.idea/workspace.xml

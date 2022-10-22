@@ -1,5 +1,5 @@
-const {Problem} = require('../problem-definition');
-const shuffle = require('../../utility/array-shuffle')
+const {Problem} = require('../../problem-definition');
+const shuffle = require('../../../utility/array-shuffle')
 
 const initial = shuffle([1,2,3,4,5,6,7,8,null]).join()
 // const initial = [3,1,2,
@@ -8,7 +8,7 @@ const initial = shuffle([1,2,3,4,5,6,7,8,null]).join()
 const answer = [null,1,2,3,4,5,6,7,8]
 
 const directed = edge => [
-    {name: edge.id, nextNode: edge.snd, cost: edge.g}
+    {name: edge.id, nextState: edge.snd, cost: edge.g}
 ]
 
 const followGraph = node => {
@@ -21,7 +21,7 @@ const followGraph = node => {
             // flatten destinations out
             .flat()
             // remove current as a possible desitnation
-            .filter(candidate => candidate.nextNode.id != node.id)
+            .filter(candidate => candidate.nextState.id != node.id)
             // create constant function to that destination
             .map(K)
 
@@ -30,13 +30,13 @@ const followGraph = node => {
 
 const equals = x => y => x == y
 const manhattanDistance = (destination) => (current) => {
-    return current.reduce((totalDistance, cVal, c) => {
-        const d = destination.findIndex(equals(cVal))
-        const dRow = Math.ceil((d + 1) * 3 / 9)
-        const dCol = (d % 3) + 1
+    return current.reduce((totalDistance, cVal, cIdx) => {
+        const dIdx = destination.findIndex(equals(cVal))
+        const dRow = Math.ceil((dIdx + 1) * 3 / 9)
+        const dCol = (dIdx % 3) + 1
 
-        const cRow = Math.ceil((c + 1) * 3 / 9)
-        const cCol = (c % 3) + 1
+        const cRow = Math.ceil((cIdx + 1) * 3 / 9)
+        const cCol = (cIdx % 3) + 1
 
         const cellDistance = Math.abs(dRow - cRow) + Math.abs(dCol - cCol)
         return totalDistance +  cellDistance
@@ -57,9 +57,9 @@ const eightPuzzle = Problem(
     manhattanDistance(answer)
 )
 
-const {bfs} = require('../known-deterministic-observable/uninformed/bfs/breadth-first-search');
-const {dfs, dfs_deepening} = require('../known-deterministic-observable/uninformed/dfs/depth-first-search');
-const {rbfs} = require('../known-deterministic-observable/informed/recursive-best-first-search');
+const {bfs} = require('../../known-deterministic-observable/uninformed/bfs/breadth-first-search');
+const {dfs, dfs_deepening} = require('../../known-deterministic-observable/uninformed/dfs/depth-first-search');
+const {rbfs} = require('../../known-deterministic-observable/informed/recursive-best-first-search');
 
 console.log((new Date()).toISOString(), "finding solution...")
 const solution = rbfs(eightPuzzle, 100)
